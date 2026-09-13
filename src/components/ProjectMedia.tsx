@@ -53,14 +53,14 @@ export function ProjectMedia({
       return (
         <div className={`flex size-full items-center justify-center gap-3 md:gap-6 overflow-hidden bg-[#EAEAEA] p-6 md:p-10 ${className}`}>
           <Image
-            src="/images/sehatconnect/sehat2.png"
+            src="/images/sehatconnect/sehat2.webp"
             alt="SehatConnect Consultation"
             width={876}
             height={1795}
             className="w-[28%] md:w-[22%] h-auto rounded-[1rem] sm:rounded-[1.5rem] md:rounded-[2rem] shadow-xl transform rotate-[-4deg] translate-y-6 opacity-90 transition-transform duration-[900ms] group-hover:rotate-[-6deg] group-hover:translate-y-8"
           />
           <Image
-            src="/images/sehatconnect/sehat1.png"
+            src="/images/sehatconnect/sehat1.webp"
             alt="SehatConnect Home"
             width={893}
             height={1761}
@@ -68,7 +68,7 @@ export function ProjectMedia({
             className="w-[32%] md:w-[26%] h-auto rounded-[1rem] sm:rounded-[1.5rem] md:rounded-[2rem] shadow-2xl z-10 transition-transform duration-[900ms] group-hover:scale-[1.02]"
           />
           <Image
-            src="/images/sehatconnect/sehat3.png"
+            src="/images/sehatconnect/sehat3.webp"
             alt="SehatConnect Doctors"
             width={888}
             height={1771}
@@ -83,21 +83,21 @@ export function ProjectMedia({
       return (
         <div className={`relative flex size-full items-center justify-center overflow-hidden bg-[#E8E8E8] ${className}`}>
           <Image
-            src="/images/vyapariq/vyapariq2.png"
+            src="/images/vyapariq/vyapariq2.webp"
             alt="VyaparIQ Products"
             width={2940}
             height={1452}
             className="absolute left-[-10%] top-[10%] w-[70%] h-auto rounded-[0.5rem] md:rounded-[0.75rem] shadow-xl opacity-60 transition-all duration-[900ms] ease-out group-hover:left-[-12%] group-hover:top-[8%] group-hover:opacity-50"
           />
           <Image
-            src="/images/vyapariq/vyapariq3.png"
+            src="/images/vyapariq/vyapariq3.webp"
             alt="VyaparIQ Chatbot"
             width={2940}
             height={1448}
             className="absolute right-[-10%] bottom-[10%] w-[70%] h-auto rounded-[0.5rem] md:rounded-[0.75rem] shadow-xl opacity-60 transition-all duration-[900ms] ease-out group-hover:right-[-12%] group-hover:bottom-[8%] group-hover:opacity-50"
           />
           <Image
-            src="/images/vyapariq/vyapariq1.png"
+            src="/images/vyapariq/vyapariq1.webp"
             alt="VyaparIQ Main"
             width={2936}
             height={1442}
@@ -113,21 +113,21 @@ export function ProjectMedia({
       return (
         <div className={`relative flex size-full items-center justify-center overflow-hidden bg-[#E2E8F0] ${className}`}>
           <Image
-            src="/images/fileint/fileint2.png"
+            src="/images/fileint/fileint2.webp"
             alt="File Intelligence Interface"
             width={2794}
             height={1674}
             className="absolute left-[-10%] top-[10%] w-[70%] h-auto rounded-[0.5rem] md:rounded-[0.75rem] shadow-xl opacity-60 transition-all duration-[900ms] ease-out group-hover:left-[-12%] group-hover:top-[8%] group-hover:opacity-50"
           />
           <Image
-            src="/images/fileint/fileint4.png"
+            src="/images/fileint/fileint4.webp"
             alt="File Intelligence Analysis"
             width={2790}
             height={1676}
             className="absolute right-[-10%] bottom-[10%] w-[70%] h-auto rounded-[0.5rem] md:rounded-[0.75rem] shadow-xl opacity-60 transition-all duration-[900ms] ease-out group-hover:right-[-12%] group-hover:bottom-[8%] group-hover:opacity-50"
           />
           <Image
-            src="/images/fileint/fileint1.png"
+            src="/images/fileint/fileint1.webp"
             alt="File Intelligence Main"
             width={2792}
             height={1670}
