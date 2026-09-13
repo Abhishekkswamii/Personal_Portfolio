@@ -1,0 +1,180 @@
+import type { ReactNode } from "react";
+import type { Profile, SocialLink } from "@/lib/content/types";
+import { HeroPortrait } from "@/components/HeroPortrait";
+import { HeroActions } from "@/components/HeroActions";
+import { PillLink } from "@/components/ArrowLink";
+
+/**
+ * The hero is three bands inside one `100svh` column:
+ *
+ *   upper    role + social links, each in its own grid column
+ *   stage    the name and the portrait — the only element allowed to flex
+ *   lower    the statement and the actions
+ *
+ * The stage takes the remaining height (`flex-1 min-h-0`) and the name is
+ * sized against both width and height, so the composition fits a short laptop
+ * window instead of overflowing it. Nothing is absolutely positioned except
+ * the portrait, which is anchored to the stage's own base — so the two
+ * registers can never collide with the navbar or with each other.
+ *
+ * Entirely a server component: the load choreography is CSS, which means there
+ * is no client/server branch to mismatch during hydration.
+ *
+ *   0.10s  system labels      0.36s  surname
+ *   0.28s  given name         0.42s  portrait begins its rise
+ *   0.85s  statement and actions
+ * After ~1.7s nothing here moves again.
+ */
+
+function Meta({
+  children,
+  delay,
+  className = "",
+}: {
+  children: ReactNode;
+  delay: number;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`reveal-meta ${className}`}
+      style={{ "--reveal-delay": `${delay}s` } as React.CSSProperties}
+    >
+      {children}
+    </div>
+  );
+}
+
+function NameLine({
+  children,
+  delay,
+  className,
+}: {
+  children: ReactNode;
+  delay: number;
+  className: string;
+}) {
+  return (
+    <span
+      className="reveal-line"
+      style={{ "--reveal-delay": `${delay}s` } as React.CSSProperties}
+    >
+      <span className={className}>{children}</span>
+    </span>
+  );
+}
+
+export function Hero({
+  profile,
+  socials,
+}: {
+  profile: Profile;
+  socials: SocialLink[];
+}) {
+  return (
+    <section
+      aria-label="Introduction"
+      className="hero-scale flex min-h-svh flex-col overflow-hidden pb-7 pt-[calc(var(--nav-h)+1.5rem)] md:pb-9 md:pt-[calc(var(--nav-h)+2.25rem)]"
+    >
+      {/* -- Upper register ------------------------------------------------
+          Two columns that never share space, so the role block and the social
+          list cannot run into one another however narrow the window gets. */}
+      <div className="shell flex shrink-0 flex-col gap-3.5 md:grid md:grid-cols-2 md:items-start md:gap-x-6">
+        <Meta delay={0.1}>
+          <p className="label text-gray">{profile.title}</p>
+          <p className="label mt-2.5 whitespace-nowrap text-ink">
+            {profile.secondary}
+          </p>
+        </Meta>
+
+        <Meta delay={0.16} className="md:justify-self-end">
+          <ul className="flex flex-row gap-x-6 md:flex-col md:items-end md:gap-3">
+            {socials.map((s) => (
+              <li key={s.id}>
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-cursor="link"
+                  className="label text-gray transition-colors duration-300 hover:text-ink"
+                >
+                  {s.label}
+                </a>
+              </li>
+            ))}
+            <li>
+              <a
+                href={`mailto:${profile.email}`}
+                data-cursor="link"
+                className="label text-gray transition-colors duration-300 hover:text-ink"
+              >
+                Email
+              </a>
+            </li>
+          </ul>
+        </Meta>
+      </div>
+
+      {/* -- Stage ----------------------------------------------------------
+          Name and portrait as one composition. Stacking, back to front:
+          portrait (z-0) · outlined given name (z-10) · solid surname (z-20).
+          The type always wins, so the name stays readable through the overlap
+          — no plate behind the figure, no z-index guesswork. */}
+      <div className="relative flex min-h-0 flex-1 items-end justify-center">
+        {/* The figure is anchored to the STAGE, not to the name block: its
+            height is capped at 100% of its containing block, and that cap is
+            only meaningful against the space the stage actually has. Sitting
+            inside the name block, it measured itself against two lines of type
+            and collapsed. It comes first in the DOM so the type paints over
+            it. */}
+        {profile.image ? <HeroPortrait image={profile.image} /> : null}
+
+        {/* pointer-events-none on the wrapper, not just the lines: it is a
+            positioned block covering the whole stage, so without this it
+            swallows the pointer and the figure beneath never sees a hover.
+            Everything inside is decorative or screen-reader-only. */}
+        <div className="shell pointer-events-none relative w-full text-center">
+          <h1 className="sr-only">
+            {profile.name} — {profile.title}
+          </h1>
+
+          <div aria-hidden="true" className="pointer-events-none relative z-10">
+            <NameLine delay={0.28} className="name-line name-line--lead name-outline">
+              {profile.firstName}
+            </NameLine>
+          </div>
+
+          <div aria-hidden="true" className="pointer-events-none relative z-20">
+            <NameLine delay={0.36} className="name-line name-line--trail">
+              {profile.lastName}
+            </NameLine>
+          </div>
+        </div>
+      </div>
+
+      {/* -- Lower register ------------------------------------------------- */}
+      <div className="shell mt-7 grid shrink-0 grid-cols-1 items-end gap-5 md:mt-9 md:grid-cols-12 md:gap-6">
+        <Meta delay={0.85} className="md:col-span-5">
+          <p className="lede max-w-[34ch] text-balance">{profile.lede}</p>
+        </Meta>
+
+        <Meta
+          delay={0.93}
+          className="md:col-span-6 md:col-start-7 md:justify-self-end"
+        >
+          <div className="flex flex-wrap items-center gap-2.5 md:justify-end">
+            <HeroActions />
+            <PillLink
+              href="/#work"
+              variant="outline"
+              direction="down"
+              cursor="link"
+            >
+              View my work
+            </PillLink>
+          </div>
+        </Meta>
+      </div>
+    </section>
+  );
+}

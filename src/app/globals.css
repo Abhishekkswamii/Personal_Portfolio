@@ -1,26 +1,450 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   DESIGN SYSTEM — Abhishek Swami
+   Monochrome editorial. Three inks, one clay accent, hairline rules.
+   ========================================================================== */
+
+@theme {
+  /* -- Ink ------------------------------------------------------------- */
+  --color-paper: #fdfdfd;
+  --color-paper-warm: #f4f2f0;
+  --color-ink: #0a0909;
+  --color-ink-soft: #1a1918;
+  --color-gray: #707070;
+  --color-gray-light: #a3a1a0;
+  --color-clay: #9c6455;
+
+  /* -- Rules ----------------------------------------------------------- */
+  --color-rule: rgba(10, 9, 9, 0.12);
+  --color-rule-soft: rgba(10, 9, 9, 0.07);
+  --color-rule-invert: rgba(253, 253, 253, 0.14);
+  --color-rule-invert-soft: rgba(253, 253, 253, 0.07);
+
+  /* -- Type ------------------------------------------------------------ */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+
+  /* -- Motion ---------------------------------------------------------- */
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* -- Rhythm ----------------------------------------------------------
+     Two numbers govern the whole page: the side gutter, and the space
+     between sections. Nothing sets its own vertical break. */
+  --spacing-gutter: clamp(1.25rem, 4.2vw, 4.5rem);
+  --spacing-section: clamp(5.5rem, 9.5vw, 9rem);
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --nav-h: 4.25rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@media (min-width: 768px) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --nav-h: 4.75rem;
   }
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-h);
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+::selection {
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* Visible, deliberate focus — never removed.
+   No border-radius here: setting it would reshape the element itself, which
+   squares off the pill buttons the moment they take focus. The outline
+   follows the element's own radius on its own. */
+:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+.on-dark :focus-visible,
+.dark-field :focus-visible {
+  outline-color: var(--color-paper);
+}
+
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+
+.shell {
+  width: 100%;
+  max-width: 102.5rem; /* 1640 */
+  margin-inline: auto;
+  padding-inline: var(--spacing-gutter);
+}
+
+/* The single vertical break between sections. */
+.section-gap {
+  padding-top: var(--spacing-section);
+}
+
+.rule-top {
+  border-top: 1px solid var(--color-rule);
+}
+
+/* ==========================================================================
+   TYPE PRIMITIVES
+   ========================================================================== */
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+@media (min-width: 768px) {
+  .label {
+    font-size: 0.75rem;
+  }
+}
+
+.display {
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+.display-tight {
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.84;
+}
+
+/* Oversized name treatment.
+   The two lines derive from one base so they always hold the same optical
+   relationship — eight characters against five.
+
+   The base is governed by width AND height. A laptop window is routinely
+   1440x700 once browser chrome and the dock are taken out, and sizing on vw
+   alone overflowed the hero there: the surname was cut off and the lower
+   register collided with everything above it. `min()` lets width lead on tall
+   viewports, where the poster should fill the page, and lets height take over
+   on short ones, where fitting is what matters.
+
+   The 20rem subtracted is the hero's fixed furniture (navbar, upper register,
+   lower register and the gaps between them); 1.95 is the two lines' combined
+   height as a multiple of the base. */
+/* One scale governs the whole hero lockup — both lines of the name and the
+   figure — so the poster keeps its proportions at every viewport instead of
+   the portrait drifting small against the type.
+
+   Width leads on tall viewports, where the poster should fill the page;
+   height takes over on short ones, where fitting is what matters. 20.6rem is
+   the hero's measured furniture (navbar, both registers, the gaps between
+   them) and 1.9 is the lockup's height as a multiple of the base. Both came
+   from the rendered page rather than an estimate — estimating them is what
+   let the surname fall off a 700px-tall window. */
+.hero-scale {
+  --name-base: clamp(2.25rem, min(19.4vw, (100svh - 20.6rem) / 1.9), 24rem);
+}
+
+.name-line {
+  display: block;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 0.8;
+}
+
+/* The two lines are one lockup, not two paragraphs: the surname is pulled up
+   into the given name's descender space so they read as a single mass. */
+.name-line--trail {
+  margin-top: -0.06em;
+}
+
+.name-line--lead {
+  font-size: var(--name-base);
+  letter-spacing: -0.055em;
+}
+
+.name-line--trail {
+  font-size: calc(var(--name-base) * 1.371);
+  letter-spacing: -0.058em;
+}
+
+/* Small screens take a larger share of the viewport — the name has to stay
+   the dominant object, not shrink into the template. The portrait occupies
+   the middle band here, so the height budget is larger. */
+@media (max-width: 767px) {
+  .hero-scale {
+    --name-base: min(23vw, (100svh - 23.5rem) / 1.9);
+  }
+}
+
+.name-outline {
+  color: transparent;
+  -webkit-text-stroke: clamp(0.7px, 0.11vw, 1.6px) var(--color-ink);
+  paint-order: stroke fill;
+}
+
+.lede {
+  font-size: clamp(1rem, 1.05vw, 1.1875rem);
+  line-height: 1.55;
+  letter-spacing: -0.011em;
+  color: var(--color-gray);
+  text-wrap: pretty;
+}
+
+.body-copy {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  letter-spacing: -0.005em;
+  color: var(--color-gray);
+  text-wrap: pretty;
+}
+
+@media (min-width: 768px) {
+  .body-copy {
+    font-size: 1rem;
+  }
+}
+
+/* ==========================================================================
+   PORTRAIT — masked editorial plate
+   ========================================================================== */
+
+/* The figure is measured from the same scale as the name, so it holds its own
+   against the type rather than shrinking into it.
+
+   Sized by HEIGHT, not width. Height is the scarce axis, and a width-driven
+   figure has an unbounded height: on a 320x640 window it grew taller than the
+   stage and rode up over the role and social links. Capping the height at
+   100% of the stage makes that impossible, and `aspect-ratio` derives the
+   width so the crop never distorts. */
+.portrait-figure {
+  height: min(calc(var(--name-base) * 1.45), 100%);
+  aspect-ratio: 1200 / 1359;
+  width: auto;
+}
+
+@media (max-width: 767px) {
+  .portrait-figure {
+    height: min(calc(var(--name-base) * 3.96), 100%);
+  }
+}
+
+/* Hero portrait grade.
+   The name's outline stroke is ink on near-black hair, so the figure is lifted
+   just enough for the letterforms to survive crossing it — and the softer
+   contrast sits better against paper than the raw studio file. */
+.portrait-hero {
+  filter: brightness(1.07) contrast(0.9);
+}
+
+/* Cut-out portrait (alpha already baked in) — only the base of the torso fades. */
+.portrait-cutout {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 82%,
+    rgba(0, 0, 0, 0.6) 93%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 82%,
+    rgba(0, 0, 0, 0.6) 93%,
+    transparent 100%
+  );
+}
+
+/* ==========================================================================
+   MOTION
+   ========================================================================== */
+
+.hide-native-cursor,
+.hide-native-cursor * {
+  cursor: none !important;
+}
+
+/* ==========================================================================
+   SSR-SAFE MOTION
+   Every entrance below is pure CSS. That is the point: a component that
+   returns a different DOM tree depending on `prefers-reduced-motion` produces
+   one structure on the server and another in the browser, and React reports a
+   hydration mismatch and throws the server HTML away. Driving these from CSS
+   keeps the markup identical everywhere, and the media query at the bottom of
+   this file switches the motion off without touching the tree.
+   ========================================================================== */
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 110%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes draw-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* The portrait entrance. Starts fully below its own clipping frame and rises
+   once, on first paint — no JavaScript, no state, nothing to mismatch. */
+@keyframes portrait-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 110%, 0) scale(0.97);
+    filter: blur(8px);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.portrait-rise {
+  animation: portrait-rise 1.25s var(--ease-editorial) 0.42s both;
+  will-change: transform, opacity, filter;
+}
+
+/* A line of display type wiped up from behind a mask. */
+.reveal-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.12em;
+}
+
+.reveal-line > * {
+  display: block;
+  animation: rise-in 1.05s var(--ease-editorial) var(--reveal-delay, 0s) both;
+}
+
+/* Hero furniture: settles after the type has established itself. */
+.reveal-meta {
+  animation: fade-up 0.8s var(--ease-editorial) var(--reveal-delay, 0s) both;
+}
+
+/* Scroll-triggered blocks. The element is laid out from the first paint and
+   only its opacity/transform change, so nothing shifts when it arrives. */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translate3d(0, var(--reveal-y, 18px), 0);
+  transition:
+    opacity 0.85s var(--ease-editorial) var(--reveal-delay, 0s),
+    transform 0.85s var(--ease-editorial) var(--reveal-delay, 0s);
+}
+
+.reveal-on-scroll[data-visible="true"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* A hairline that draws itself in. */
+.reveal-rule {
+  height: 1px;
+  width: 100%;
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 1.1s var(--ease-soft) var(--reveal-delay, 0s);
+}
+
+.reveal-rule[data-visible="true"] {
+  transform: scaleX(1);
+}
+
+/* Route transition: the incoming page settles. Always rendered, never
+   conditionally mounted. */
+.page-enter {
+  animation: fade-up 0.55s var(--ease-editorial) both;
+}
+
+/* ==========================================================================
+   REDUCED MOTION — elegant static version, not a broken one.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* Same DOM, no motion: everything simply starts in its final state. */
+  .portrait-rise,
+  .reveal-line > *,
+  .reveal-meta,
+  .page-enter {
+    animation: none !important;
+  }
+
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .reveal-rule {
+    transform: scaleX(1) !important;
+    transition: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Utility for content that only screen readers need. */
+.sr-only-focusable:not(:focus):not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

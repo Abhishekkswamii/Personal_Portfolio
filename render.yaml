@@ -1,0 +1,51 @@
+# =============================================================================
+# Render Blueprint
+#
+# One web service serves the public site, the admin dashboard and every
+# server action — there is no second frontend and no separate API service.
+#
+# This file only declares shape (build/start commands, the persistent disk
+# mount, which env vars exist). It intentionally does NOT set real values for
+# REDIS_URL or AUTH_SECRET — `sync: false` means Render will prompt for them
+# once, in the dashboard, and never store them here or in git.
+#
+# Deploy: Render Dashboard → New → Blueprint → point at this repo.
+# =============================================================================
+
+services:
+  - type: web
+    name: portfolio
+    runtime: node
+    plan: starter # any plan with disk support; persistent disks require a paid plan
+    region: oregon # change to whichever region is closest to you
+    branch: main
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /
+    autoDeploy: true
+
+    # Render's default filesystem is ephemeral — this is the one directory
+    # that survives both a restart and a new deploy. See MEDIA_ROOT below.
+    disk:
+      name: portfolio-media
+      mountPath: /var/data
+      sizeGB: 1
+
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: MEDIA_ROOT
+        value: /var/data/uploads
+      - key: MAX_UPLOAD_MB
+        value: "12"
+      - key: NEXT_PUBLIC_MAX_UPLOAD_MB
+        value: "12"
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://abhishekswami.work.gd
+      # Secrets: set once in the Render dashboard, never here.
+      - key: REDIS_URL
+        sync: false
+      - key: AUTH_SECRET
+        sync: false
+      - key: CONTACT_FORM_URL
+        sync: false
