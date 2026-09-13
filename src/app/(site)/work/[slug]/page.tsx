@@ -91,16 +91,6 @@ function NumberedList({ items }: { items: string[] }) {
   );
 }
 
-/**
- * Revalidate periodically as well as on demand.
- *
- * Admin saves call revalidatePath, so edits appear immediately. This interval
- * is the safety net: if the build ran before the database was reachable, or a
- * revalidation is ever missed, the page still refreshes itself rather than
- * serving stale content indefinitely.
- */
-export const revalidate = 300;
-
 export default async function ProjectPage(props: PageProps<"/work/[slug]">) {
   const { slug } = await props.params;
   const project = await getProject(slug);

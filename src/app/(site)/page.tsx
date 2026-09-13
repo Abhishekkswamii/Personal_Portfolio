@@ -8,16 +8,6 @@ import { Skills } from "@/sections/Skills";
 import { Patent } from "@/sections/Patent";
 import { Contact } from "@/sections/Contact";
 
-/**
- * Revalidate periodically as well as on demand.
- *
- * Admin saves call revalidatePath, so edits appear immediately. This interval
- * is the safety net: if the build ran before the database was reachable, or a
- * revalidation is ever missed, the page still refreshes itself rather than
- * serving stale content indefinitely.
- */
-export const revalidate = 300;
-
 export default async function Home() {
   const content = await getSiteContent();
 

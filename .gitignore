@@ -49,6 +49,9 @@ next-env.d.ts
 # record of which variables the app needs. It contains names only, no values.
 !.env.example
 
-# uploaded media (local dev). In production these live on the Render
-# persistent disk at MEDIA_ROOT, outside the repo entirely.
-/public/uploads
+# firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+*firebase-adminsdk*.json
+*-service-account*.json
