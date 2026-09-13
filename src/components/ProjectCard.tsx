@@ -21,7 +21,7 @@ export function ProjectCard({
   const flipped = index % 2 === 1;
 
   return (
-    <Reveal as="div" y={26}>
+    <Reveal as="div" y={34}>
       <Link
         href={`/work/${project.slug}`}
         data-cursor="view"

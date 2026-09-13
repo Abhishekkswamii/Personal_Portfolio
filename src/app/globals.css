@@ -249,6 +249,55 @@ body {
   }
 }
 
+/* -- Hover annotation ------------------------------------------------------
+   The marks and the colour plate are driven by one boolean on the root
+   (`data-hovered`) and two custom properties the rAF loop writes (--px/--py).
+   Nothing here re-renders on pointer move: the plate is positioned purely in
+   CSS from those properties, which is what keeps a 60fps trail cheap. */
+
+.portrait-marks {
+  opacity: 0;
+  transition: opacity 0.45s var(--ease-editorial);
+}
+
+[data-hovered="true"] .portrait-marks {
+  opacity: 1;
+}
+
+/* A small portrait-ratio plate that trails the pointer. Deliberately modest —
+   it is an annotation on the figure, not a second hero image.
+
+   Offset up and to the right of the cursor rather than centred on it: a plate
+   sitting under the pointer covers the very thing you are pointing at, which
+   on a portrait means it lands squarely on the face. */
+.portrait-plate {
+  left: var(--px, 50%);
+  top: var(--py, 50%);
+  width: 6.75rem;
+  aspect-ratio: 720 / 858;
+  transform: translate3d(1.75rem, -100%, 0) scale(0.92);
+  opacity: 0;
+  transition:
+    opacity 0.4s var(--ease-editorial),
+    transform 0.5s var(--ease-editorial);
+  box-shadow: 0 18px 40px -24px rgba(10, 9, 9, 0.45);
+  outline: 1px solid var(--color-rule);
+}
+
+[data-hovered="true"] .portrait-plate {
+  opacity: 1;
+  transform: translate3d(1.75rem, -100%, 0) scale(1);
+}
+
+/* The technical label sits over whatever the composition puts behind it —
+   often the solid surname. A paper chip keeps it legible without raising the
+   annotation above the type, which would break the stacking order. */
+.portrait-tag {
+  background: var(--color-paper);
+  padding: 0.25rem 0.4rem;
+  box-shadow: 0 0 0 1px var(--color-rule);
+}
+
 /* Hero portrait grade.
    The name's outline stroke is ink on near-black hair, so the figure is lifted
    just enough for the letterforms to survive crossing it — and the softer
@@ -285,19 +334,38 @@ body {
 }
 
 /* ==========================================================================
-   SSR-SAFE MOTION
-   Every entrance below is pure CSS. That is the point: a component that
-   returns a different DOM tree depending on `prefers-reduced-motion` produces
-   one structure on the server and another in the browser, and React reports a
-   hydration mismatch and throws the server HTML away. Driving these from CSS
-   keeps the markup identical everywhere, and the media query at the bottom of
-   this file switches the motion off without touching the tree.
+   MOTION SYSTEM
+   One grammar for the whole site:
+
+       soft  →  move  →  contrast returns  →  settle  →  stop
+
+   Nothing simply fades in. Every element arrives washed out and slightly
+   displaced, then gains its full contrast as it moves into place. On a
+   near-white ground, animating opacity IS the contrast restoration — dark
+   type at 0.18 reads as pale grey and resolves to near-black as it settles.
+
+   All of it is CSS. That is the point: a component that returns a different
+   DOM tree depending on `prefers-reduced-motion` renders one structure on the
+   server and another in the browser, and React throws the server HTML away
+   with a hydration error. Driving entrances from the stylesheet keeps the
+   markup identical everywhere, and the media query at the bottom of this file
+   switches the motion off without touching a single element.
    ========================================================================== */
 
-@keyframes rise-in {
+.hide-native-cursor,
+.hide-native-cursor * {
+  cursor: none !important;
+}
+
+/* -- Entrances -------------------------------------------------------------
+   Three directions, one curve. Anything arriving from the navbar's side of
+   the page drops in; anything arriving from below rises; the name settles
+   down out of a slightly oversized state, as though being placed. */
+
+@keyframes enter-down {
   from {
     opacity: 0;
-    transform: translate3d(0, 110%, 0);
+    transform: translate3d(0, -16px, 0);
   }
   to {
     opacity: 1;
@@ -305,14 +373,43 @@ body {
   }
 }
 
-@keyframes fade-up {
+@keyframes enter-up {
   from {
-    opacity: 0;
-    transform: translate3d(0, 12px, 0);
+    opacity: 0.15;
+    transform: translate3d(0, 22px, 0);
   }
   to {
     opacity: 1;
     transform: translate3d(0, 0, 0);
+  }
+}
+
+/* The name: oversized and pale, then settling into size and full contrast. */
+@keyframes settle-type {
+  from {
+    opacity: 0.2;
+    transform: translate3d(0, -18px, 0) scale(1.045);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* The portrait: starts fully below its own clipping frame and rises once. */
+@keyframes portrait-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 110%, 0) scale(0.97);
+    filter: blur(8px);
+  }
+  55% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
   }
 }
 
@@ -325,54 +422,43 @@ body {
   }
 }
 
-/* The portrait entrance. Starts fully below its own clipping frame and rises
-   once, on first paint — no JavaScript, no state, nothing to mismatch. */
-@keyframes portrait-rise {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 110%, 0) scale(0.97);
-    filter: blur(8px);
-  }
-  60% {
-    opacity: 1;
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
-  }
+/* -- Load choreography ------------------------------------------------------
+   0.05s  navbar drops
+   0.18s  hero metadata drops
+   0.34s  given name settles      0.42s  surname settles
+   0.80s  portrait begins its rise
+   1.05s  supporting copy         1.15s  actions
+   Everything is still by ~2s, and nothing loops. */
+
+.enter-down {
+  animation: enter-down 0.8s var(--ease-editorial) var(--enter-delay, 0s) both;
+}
+
+.enter-up {
+  animation: enter-up 0.9s var(--ease-editorial) var(--enter-delay, 0s) both;
+}
+
+.settle-type {
+  animation: settle-type 1.1s var(--ease-editorial) var(--enter-delay, 0s) both;
+  transform-origin: 50% 100%;
+  will-change: transform, opacity;
 }
 
 .portrait-rise {
-  animation: portrait-rise 1.25s var(--ease-editorial) 0.42s both;
+  animation: portrait-rise 1.15s var(--ease-editorial) 0.8s both;
   will-change: transform, opacity, filter;
 }
 
-/* A line of display type wiped up from behind a mask. */
-.reveal-line {
-  display: block;
-  overflow: hidden;
-  padding-bottom: 0.12em;
-}
+/* -- Scroll reveals ---------------------------------------------------------
+   Same grammar below the fold. The element is laid out from first paint and
+   only opacity/transform change, so nothing shifts when it arrives. */
 
-.reveal-line > * {
-  display: block;
-  animation: rise-in 1.05s var(--ease-editorial) var(--reveal-delay, 0s) both;
-}
-
-/* Hero furniture: settles after the type has established itself. */
-.reveal-meta {
-  animation: fade-up 0.8s var(--ease-editorial) var(--reveal-delay, 0s) both;
-}
-
-/* Scroll-triggered blocks. The element is laid out from the first paint and
-   only its opacity/transform change, so nothing shifts when it arrives. */
 .reveal-on-scroll {
-  opacity: 0;
-  transform: translate3d(0, var(--reveal-y, 18px), 0);
+  opacity: 0.15;
+  transform: translate3d(0, var(--reveal-y, 28px), 0);
   transition:
-    opacity 0.85s var(--ease-editorial) var(--reveal-delay, 0s),
-    transform 0.85s var(--ease-editorial) var(--reveal-delay, 0s);
+    opacity 0.95s var(--ease-editorial) var(--reveal-delay, 0s),
+    transform 0.95s var(--ease-editorial) var(--reveal-delay, 0s);
 }
 
 .reveal-on-scroll[data-visible="true"] {
@@ -396,7 +482,7 @@ body {
 /* Route transition: the incoming page settles. Always rendered, never
    conditionally mounted. */
 .page-enter {
-  animation: fade-up 0.55s var(--ease-editorial) both;
+  animation: enter-up 0.6s var(--ease-editorial) both;
 }
 
 /* ==========================================================================
@@ -410,8 +496,9 @@ body {
 
   /* Same DOM, no motion: everything simply starts in its final state. */
   .portrait-rise,
-  .reveal-line > *,
-  .reveal-meta,
+  .settle-type,
+  .enter-down,
+  .enter-up,
   .page-enter {
     animation: none !important;
   }
@@ -424,6 +511,13 @@ body {
 
   .reveal-rule {
     transform: scaleX(1) !important;
+    transition: none !important;
+  }
+
+  /* The hover annotation stays available — it is an interaction, not an
+     entrance — but it appears rather than glides. */
+  .portrait-marks,
+  .portrait-plate {
     transition: none !important;
   }
 

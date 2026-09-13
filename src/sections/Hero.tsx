@@ -13,54 +13,40 @@ import { PillLink } from "@/components/ArrowLink";
  *
  * The stage takes the remaining height (`flex-1 min-h-0`) and the name is
  * sized against both width and height, so the composition fits a short laptop
- * window instead of overflowing it. Nothing is absolutely positioned except
- * the portrait, which is anchored to the stage's own base — so the two
- * registers can never collide with the navbar or with each other.
+ * window instead of overflowing it.
  *
- * Entirely a server component: the load choreography is CSS, which means there
- * is no client/server branch to mismatch during hydration.
+ * Load choreography follows the site's one motion grammar — soft, then
+ * moving, then full contrast, then still:
  *
- *   0.10s  system labels      0.36s  surname
- *   0.28s  given name         0.42s  portrait begins its rise
- *   0.85s  statement and actions
- * After ~1.7s nothing here moves again.
+ *   0.18s  role and social links drop in
+ *   0.34s  ABHISHEK settles out of an oversized, pale state
+ *   0.42s  SWAMI follows
+ *   0.80s  the portrait begins rising from below its frame
+ *   1.05s  the statement resolves
+ *   1.15s  the actions resolve
+ *
+ * Entirely a server component: the choreography is CSS, so there is no
+ * client/server branch to mismatch during hydration.
  */
 
-function Meta({
+function Band({
   children,
   delay,
   className = "",
+  from = "down",
 }: {
   children: ReactNode;
   delay: number;
   className?: string;
+  from?: "down" | "up";
 }) {
   return (
     <div
-      className={`reveal-meta ${className}`}
-      style={{ "--reveal-delay": `${delay}s` } as React.CSSProperties}
+      className={`${from === "down" ? "enter-down" : "enter-up"} ${className}`}
+      style={{ "--enter-delay": `${delay}s` } as React.CSSProperties}
     >
       {children}
     </div>
-  );
-}
-
-function NameLine({
-  children,
-  delay,
-  className,
-}: {
-  children: ReactNode;
-  delay: number;
-  className: string;
-}) {
-  return (
-    <span
-      className="reveal-line"
-      style={{ "--reveal-delay": `${delay}s` } as React.CSSProperties}
-    >
-      <span className={className}>{children}</span>
-    </span>
   );
 }
 
@@ -80,14 +66,14 @@ export function Hero({
           Two columns that never share space, so the role block and the social
           list cannot run into one another however narrow the window gets. */}
       <div className="shell flex shrink-0 flex-col gap-3.5 md:grid md:grid-cols-2 md:items-start md:gap-x-6">
-        <Meta delay={0.1}>
+        <Band delay={0.18}>
           <p className="label text-gray">{profile.title}</p>
           <p className="label mt-2.5 whitespace-nowrap text-ink">
             {profile.secondary}
           </p>
-        </Meta>
+        </Band>
 
-        <Meta delay={0.16} className="md:justify-self-end">
+        <Band delay={0.24} className="md:justify-self-end">
           <ul className="flex flex-row gap-x-6 md:flex-col md:items-end md:gap-3">
             {socials.map((s) => (
               <li key={s.id}>
@@ -112,7 +98,7 @@ export function Hero({
               </a>
             </li>
           </ul>
-        </Meta>
+        </Band>
       </div>
 
       {/* -- Stage ----------------------------------------------------------
@@ -123,10 +109,8 @@ export function Hero({
       <div className="relative flex min-h-0 flex-1 items-end justify-center">
         {/* The figure is anchored to the STAGE, not to the name block: its
             height is capped at 100% of its containing block, and that cap is
-            only meaningful against the space the stage actually has. Sitting
-            inside the name block, it measured itself against two lines of type
-            and collapsed. It comes first in the DOM so the type paints over
-            it. */}
+            only meaningful against the space the stage actually has. It comes
+            first in the DOM so the type paints over it. */}
         {profile.image ? <HeroPortrait image={profile.image} /> : null}
 
         {/* pointer-events-none on the wrapper, not just the lines: it is a
@@ -138,28 +122,38 @@ export function Hero({
             {profile.name} — {profile.title}
           </h1>
 
-          <div aria-hidden="true" className="pointer-events-none relative z-10">
-            <NameLine delay={0.28} className="name-line name-line--lead name-outline">
+          {/* One lockup, two lines. Both settle on the same curve a beat
+              apart, so they read as a single object being placed rather than
+              two independent blocks animating. */}
+          <div aria-hidden="true" className="relative z-10">
+            <span
+              className="settle-type name-line name-line--lead name-outline block"
+              style={{ "--enter-delay": "0.34s" } as React.CSSProperties}
+            >
               {profile.firstName}
-            </NameLine>
+            </span>
           </div>
 
-          <div aria-hidden="true" className="pointer-events-none relative z-20">
-            <NameLine delay={0.36} className="name-line name-line--trail">
+          <div aria-hidden="true" className="relative z-20">
+            <span
+              className="settle-type name-line name-line--trail block"
+              style={{ "--enter-delay": "0.42s" } as React.CSSProperties}
+            >
               {profile.lastName}
-            </NameLine>
+            </span>
           </div>
         </div>
       </div>
 
       {/* -- Lower register ------------------------------------------------- */}
       <div className="shell mt-7 grid shrink-0 grid-cols-1 items-end gap-5 md:mt-9 md:grid-cols-12 md:gap-6">
-        <Meta delay={0.85} className="md:col-span-5">
+        <Band delay={1.05} from="up" className="md:col-span-5">
           <p className="lede max-w-[34ch] text-balance">{profile.lede}</p>
-        </Meta>
+        </Band>
 
-        <Meta
-          delay={0.93}
+        <Band
+          delay={1.15}
+          from="up"
           className="md:col-span-6 md:col-start-7 md:justify-self-end"
         >
           <div className="flex flex-wrap items-center gap-2.5 md:justify-end">
@@ -173,7 +167,7 @@ export function Hero({
               View my work
             </PillLink>
           </div>
-        </Meta>
+        </Band>
       </div>
     </section>
   );

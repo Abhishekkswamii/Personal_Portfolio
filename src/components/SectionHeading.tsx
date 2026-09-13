@@ -21,7 +21,7 @@ export function SectionHeading({
     <header>
       <RevealRule dark={dark} />
       <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3 pt-5 md:pt-6">
-        <Reveal y={12}>
+        <Reveal y={14}>
           <h2 className={`label ${dark ? "text-paper" : "text-ink"}`}>
             <span
               aria-hidden="true"
@@ -33,7 +33,7 @@ export function SectionHeading({
           </h2>
         </Reveal>
         {note ? (
-          <Reveal y={12} delay={0.06}>
+          <Reveal y={14} delay={0.08}>
             <p className={`label ${dark ? "text-paper/45" : "text-gray-light"}`}>
               {note}
             </p>
@@ -42,7 +42,7 @@ export function SectionHeading({
       </div>
 
       {intro ? (
-        <Reveal y={14} delay={0.1}>
+        <Reveal y={18} delay={0.16}>
           <p className="lede mt-7 max-w-[32ch] text-ink/70 md:mt-8">{intro}</p>
         </Reveal>
       ) : null}

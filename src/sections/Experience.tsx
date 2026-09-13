@@ -57,8 +57,8 @@ export function Experience({
               <Reveal
                 as="li"
                 key={role.id}
-                y={20}
-                delay={i * 0.07}
+                y={26}
+                delay={i * 0.09}
                 onMouseEnter={() => setActive(i)}
                 onFocus={() => setActive(i)}
                 className="border-t border-rule-invert"

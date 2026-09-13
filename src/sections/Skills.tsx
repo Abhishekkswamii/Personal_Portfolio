@@ -16,7 +16,7 @@ export function Skills({ categories }: { categories: SkillCategory[] }) {
 
       <dl className="mt-10 md:mt-14">
         {categories.map((group, i) => (
-          <Reveal key={group.id} delay={i * 0.04} y={14}>
+          <Reveal key={group.id} delay={i * 0.07} y={22}>
             <div className="group grid grid-cols-1 gap-2 border-t border-rule py-6 transition-colors duration-500 hover:border-ink/25 md:grid-cols-12 md:items-baseline md:gap-8 md:py-7">
               <dt className="label text-gray-light transition-colors duration-500 group-hover:text-ink md:col-span-3">
                 {group.title}

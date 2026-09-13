@@ -93,8 +93,12 @@ export function Navbar({
         Skip to content
       </a>
 
+      {/* The navbar drops in first, ahead of the hero type — the top of the
+          page establishing itself before anything is placed on the canvas.
+          A CSS animation, so the markup is identical on server and client. */}
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${
+        style={{ "--enter-delay": "0.05s" } as React.CSSProperties}
+        className={`enter-down fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${
           scrolled || !onHome
             ? "border-b border-rule bg-paper"
             : "border-b border-transparent bg-paper/0"

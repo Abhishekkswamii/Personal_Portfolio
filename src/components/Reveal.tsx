@@ -105,8 +105,9 @@ export function Reveal({
 }
 
 /**
- * A line of type wiped up from behind a mask. Reserved for section headings
- * and the largest statements — the loudest move in the system.
+ * A line of display type. Reserved for section headings and the largest
+ * statements. Uses the same soft-to-contrast grammar as everything else, just
+ * with more travel, so the biggest type reads as the heaviest object landing.
  */
 export function RevealLine({
   children,
@@ -122,9 +123,9 @@ export function RevealLine({
   return (
     <span
       ref={ref}
-      className="reveal-line reveal-on-scroll"
+      className="reveal-on-scroll block"
       style={
-        { "--reveal-delay": `${delay}s`, "--reveal-y": "0px" } as React.CSSProperties
+        { "--reveal-delay": `${delay}s`, "--reveal-y": "34px" } as React.CSSProperties
       }
     >
       {/* The trailing space is load-bearing: without it, consecutive lines run
