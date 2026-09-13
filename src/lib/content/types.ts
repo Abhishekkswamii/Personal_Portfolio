@@ -52,7 +52,7 @@ export type Project = {
     live: string | null;
   };
   /** Fallback drawing used until a real image is uploaded. */
-  diagram: "sehat" | "medguard" | "fileint" | null;
+  diagram: "sehat" | "vyapariq" | "fileint" | null;
   featured: boolean;
   published: boolean;
   sortOrder: number;

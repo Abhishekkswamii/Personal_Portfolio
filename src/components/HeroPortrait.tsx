@@ -7,10 +7,11 @@ import type { ImageRef } from "@/lib/content/types";
 /**
  * The signature element.
  *
- * Composition: the portrait is the BACK layer. Both lines of the name render
- * over it — the outlined given name traces across the figure, the solid
- * surname crosses the chest. The name is therefore never obscured, and the
- * overlap reads as deliberate rather than accidental.
+ * Composition: the portrait sits BETWEEN the two lines of the name — the
+ * outlined given name passes behind the head, the solid surname crosses in
+ * front of the chest. That interleaving is what makes the figure read as cut
+ * into the typography rather than placed behind it, and it keeps the face
+ * clear of the heaviest ink on the page.
  *
  * Entrance: a CSS keyframe (`.portrait-rise`). The figure starts fully below
  * its own clipping frame and rises once, after the typography has begun to
@@ -18,15 +19,11 @@ import type { ImageRef } from "@/lib/content/types";
  * hydration-safe — no client-only state, so server and browser render the
  * same markup — and `prefers-reduced-motion` cancels it in the stylesheet.
  *
- * Hover: editorial annotation, not a HUD. Corner registration marks, a
- * crosshair, an alignment guide and an index label fade in, and a small
- * colour plate follows the pointer — a second, warmer frame of the same
- * person, discovered rather than displayed. The grayscale figure itself never
- * moves beyond ~3px of parallax and never scales.
- *
- * Pointer position is written straight to CSS custom properties inside a rAF
- * loop that lerps toward the target, so the plate trails the cursor smoothly
- * without a re-render per mousemove.
+ * Hover: editorial registration marks, not a HUD. Thin corner brackets, one
+ * guide, a crosshair and a small index label fade in. Nothing else — no
+ * second image, no colour, no floating panel. The figure itself never scales
+ * and never moves beyond ~3px of parallax, which is lerped in a rAF loop so
+ * it reads as weight rather than as an effect.
  */
 export function HeroPortrait({ image }: { image: ImageRef }) {
   const [hovered, setHovered] = useState(false);
@@ -63,11 +60,8 @@ export function HeroPortrait({ image }: { image: ImageRef }) {
       current.current.x += (target.current.x - current.current.x) * 0.14;
       current.current.y += (target.current.y - current.current.y) * 0.14;
 
-      el.style.setProperty("--px", `${current.current.x.toFixed(1)}px`);
-      el.style.setProperty("--py", `${current.current.y.toFixed(1)}px`);
-
-      // A few pixels of counter-movement on the figure itself — a response,
-      // not an effect. Capped at 3px in each axis.
+      // The lerped pointer drives one thing only: a few pixels of
+      // counter-movement on the figure. A response, not an effect.
       if (fig) {
         const box = el.getBoundingClientRect();
         const dx = (current.current.x / box.width - 0.5) * 6;
@@ -91,6 +85,19 @@ export function HeroPortrait({ image }: { image: ImageRef }) {
   }, []);
 
   return (
+    /* The figure is centred by a flex parent rather than by a transform on
+       itself. A transform creates a stacking context, and that context was
+       trapping the whole annotation layer underneath the name — which is why
+       the label came out sliced by the letterforms. `inset-0` keeps the
+       parent's height definite, so the figure's `100%` height cap (the thing
+       stopping it bursting the stage on small screens) still resolves.
+
+       The interleave (z-20, between the two name lines) applies from `md`
+       up only. On a phone the figure fills most of the stage, so putting it
+       above the outlined line hides that line completely — half the name
+       disappears. There it stays the back layer and both lines read over
+       it. */
+    <div className="pointer-events-none absolute inset-0 z-0 flex items-end justify-center md:z-20">
     <div
       ref={root}
       data-cursor="portrait"
@@ -102,7 +109,7 @@ export function HeroPortrait({ image }: { image: ImageRef }) {
       }}
       onPointerLeave={reset}
       onPointerMove={onPointerMove}
-      className="portrait-figure group absolute bottom-0 left-1/2 z-0 -translate-x-1/2 select-none"
+      className="portrait-figure group pointer-events-auto relative select-none"
     >
       <div className="relative h-full">
         {/* The clipping frame the figure rises out of. */}
@@ -145,8 +152,9 @@ export function HeroPortrait({ image }: { image: ImageRef }) {
             />
           ))}
 
-          {/* Guides through the centre of the figure. */}
-          <span className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-ink/12" />
+          {/* One guide, on the subject's eyeline. A second, vertical rule
+              started to look like a targeting overlay rather than an
+              editorial mark. */}
           <span className="absolute left-0 top-[22%] h-px w-full bg-ink/12" />
 
           {/* Crosshair on the subject. */}
@@ -160,26 +168,8 @@ export function HeroPortrait({ image }: { image: ImageRef }) {
           </span>
         </div>
 
-        {/* -- Colour plate. A second frame of the same person, trailing the
-            pointer. Subordinate to the figure: small, hairline-framed, and
-            gone the moment the pointer leaves. ---------------------------- */}
-        <div
-          aria-hidden="true"
-          className="portrait-plate pointer-events-none absolute hidden md:block"
-        >
-          <div className="relative h-full w-full overflow-hidden bg-paper-warm">
-            <Image
-              src="/images/profile-colour.webp"
-              alt=""
-              width={720}
-              height={858}
-              loading="lazy"
-              sizes="200px"
-              className="h-full w-full object-cover"
-            />
-          </div>
-        </div>
       </div>
+    </div>
     </div>
   );
 }

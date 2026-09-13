@@ -160,22 +160,22 @@ function SehatDiagram({ className }: { className?: string }) {
   );
 }
 
-/** MedGuard-RAG — the graph, including the branch that refuses to answer. */
-function MedGuardDiagram({ className }: { className?: string }) {
+/** VyaparIQ — microservices and caching diagram. */
+function VyaparIQDiagram({ className }: { className?: string }) {
   const nodes = [
-    { x: 46, label: "QUERY" },
-    { x: 140, label: "RETRIEVE" },
-    { x: 234, label: "TRIAGE" },
-    { x: 328, label: "GENERATE" },
+    { x: 46, label: "CLIENT" },
+    { x: 140, label: "EXPRESS" },
+    { x: 234, label: "FASTAPI" },
+    { x: 328, label: "GEMINI" },
   ];
 
   return (
-    <Frame code="FIG. 02 — RESPONSE GRAPH" className={className}>
-      {/* Vector store feeding retrieval */}
+    <Frame code="FIG. 02 — E-COMMERCE ARCHITECTURE" className={className}>
+      {/* DB feeding Express */}
       <g>
-        <rect x="110" y="58" width="76" height="40" rx="3" className={STROKE} strokeWidth="1" />
-        <text x="120" y="76" className="fill-ink/45 font-mono" fontSize="8" letterSpacing="1.1">
-          CHROMADB
+        <rect x="110" y="58" width="86" height="40" rx="3" className={STROKE} strokeWidth="1" />
+        <text x="118" y="76" className="fill-ink/45 font-mono" fontSize="8" letterSpacing="1.1">
+          POSTGRESQL
         </text>
         {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
           <circle
@@ -186,7 +186,7 @@ function MedGuardDiagram({ className }: { className?: string }) {
             className="fill-ink/30"
           />
         ))}
-        <path d="M148 98v28" className={STROKE} strokeWidth="1" strokeDasharray="3 3" />
+        <path d="M153 98v28" className={STROKE} strokeWidth="1" strokeDasharray="3 3" />
       </g>
 
       {/* Main chain */}
@@ -225,10 +225,10 @@ function MedGuardDiagram({ className }: { className?: string }) {
         <path d="M426 143.5 430 147l-4 3.5" />
       </g>
       <text x="404" y="176" className="fill-ink/45 font-mono" fontSize="8" letterSpacing="1.1">
-        ANSWER
+        RESPONSE
       </text>
 
-      {/* The refusal branch — the point of the whole system */}
+      {/* Cache branch */}
       <g>
         <path
           d="M272 168v46h-92"
@@ -238,19 +238,8 @@ function MedGuardDiagram({ className }: { className?: string }) {
         />
         <path d="M186 210.5 180 214l6 3.5" className={STROKE} strokeWidth="1.1" />
         <rect x="94" y="196" width="86" height="36" rx="3" className={STROKE} strokeWidth="1.1" />
-        <text x="104" y="218" className="fill-ink/55 font-mono" fontSize="8.5" letterSpacing="1.2">
-          FALLBACK
-        </text>
-      </g>
-
-      {/* Confidence threshold */}
-      <g>
-        <path d="M94 268h292" className={STROKE} strokeWidth="1" />
-        <path d="M94 264v8M386 264v8" className={STROKE} strokeWidth="1" />
-        <path d="M258 258v20" className={STROKE_STRONG} strokeWidth="1.4" />
-        <path d="M94 268h164" className={STROKE_STRONG} strokeWidth="2.5" />
-        <text x="94" y="290" className="fill-ink/40 font-mono" fontSize="8" letterSpacing="1.1">
-          CONFIDENCE THRESHOLD
+        <text x="114" y="218" className="fill-ink/55 font-mono" fontSize="8.5" letterSpacing="1.2">
+          REDIS
         </text>
       </g>
     </Frame>
@@ -370,7 +359,7 @@ function FileIntDiagram({ className }: { className?: string }) {
   );
 }
 
-export type DiagramKey = "sehat" | "medguard" | "fileint";
+export type DiagramKey = "sehat" | "vyapariq" | "fileint";
 
 export function ProjectVisual({
   variant,
@@ -382,6 +371,6 @@ export function ProjectVisual({
 }) {
   const cls = size === "plate" ? "max-w-[52rem]" : "max-w-[38rem]";
   if (variant === "sehat") return <SehatDiagram className={cls} />;
-  if (variant === "medguard") return <MedGuardDiagram className={cls} />;
+  if (variant === "vyapariq") return <VyaparIQDiagram className={cls} />;
   return <FileIntDiagram className={cls} />;
 }

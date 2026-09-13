@@ -73,12 +73,17 @@ export function CustomCursor() {
   // into a ring — the technical marks on the figure carry the message, and a
   // labelled disc on top of them would be two voices saying the same thing.
   //
-  // Sizes are capped at 56px. The cursor is a hint, not an object: anything
+  // Sizes are capped at 44px. The cursor is a hint, not an object: anything
   // larger starts covering the very thing it is pointing at — a button label,
   // the navigation, a face.
+  //
+  // The portrait deliberately does NOT enlarge it. That is the one surface
+  // where the cursor sits directly over a face, and it is also where the
+  // registration marks and the colour fragment are doing the talking; a
+  // swollen ring there competes with both.
   const expanded = mode === "view";
   const size =
-    mode === "view" ? 56 : mode === "portrait" ? 34 : mode === "cta" ? 28 : mode === "link" ? 24 : 9;
+    mode === "view" ? 44 : mode === "portrait" ? 9 : mode === "cta" ? 28 : mode === "link" ? 24 : 9;
   const caption = mode === "view" ? "View" : "";
 
   return (

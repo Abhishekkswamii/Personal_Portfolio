@@ -65,7 +65,7 @@ export function Hero({
       {/* -- Upper register ------------------------------------------------
           Two columns that never share space, so the role block and the social
           list cannot run into one another however narrow the window gets. */}
-      <div className="shell flex shrink-0 flex-col gap-3.5 md:grid md:grid-cols-2 md:items-start md:gap-x-6">
+      <div className="hero-upper shell flex shrink-0 flex-col gap-3.5 md:grid md:grid-cols-2 md:items-start md:gap-x-6">
         <Band delay={0.18}>
           <p className="label text-gray">{profile.title}</p>
           <p className="label mt-2.5 whitespace-nowrap text-ink">
@@ -74,7 +74,7 @@ export function Hero({
         </Band>
 
         <Band delay={0.24} className="md:justify-self-end">
-          <ul className="flex flex-row gap-x-6 md:flex-col md:items-end md:gap-3">
+          <ul className="hero-socials flex flex-row gap-x-6 md:flex-col md:items-end md:gap-3">
             {socials.map((s) => (
               <li key={s.id}>
                 <a
@@ -103,9 +103,11 @@ export function Hero({
 
       {/* -- Stage ----------------------------------------------------------
           Name and portrait as one composition. Stacking, back to front:
-          portrait (z-0) · outlined given name (z-10) · solid surname (z-20).
-          The type always wins, so the name stays readable through the overlap
-          — no plate behind the figure, no z-index guesswork. */}
+          outlined given name (z-10) · portrait (z-20) · solid surname (z-30).
+          The figure is interleaved BETWEEN the two lines rather than sitting
+          behind both: the outline passes behind the head, the solid surname
+          crosses the chest. That is the difference between a photograph
+          placed on a page and one cut into it. */}
       <div className="relative flex min-h-0 flex-1 items-end justify-center">
         {/* The figure is anchored to the STAGE, not to the name block: its
             height is capped at 100% of its containing block, and that cap is
@@ -122,31 +124,31 @@ export function Hero({
             {profile.name} — {profile.title}
           </h1>
 
-          {/* One lockup, two lines. Both settle on the same curve a beat
-              apart, so they read as a single object being placed rather than
-              two independent blocks animating. */}
-          <div aria-hidden="true" className="relative z-10">
-            <span
-              className="settle-type name-line name-line--lead name-outline block"
-              style={{ "--enter-delay": "0.34s" } as React.CSSProperties}
-            >
-              {profile.firstName}
-            </span>
-          </div>
+          {/* One lockup. Stacked on mobile, single horizontal line on desktop. */}
+          <div aria-hidden="true" className="name-lockup">
+            <div className="relative z-10">
+              <span
+                className="settle-type name-line name-line--lead name-outline"
+                style={{ "--enter-delay": "0.34s" } as React.CSSProperties}
+              >
+                {profile.firstName}
+              </span>
+            </div>
 
-          <div aria-hidden="true" className="relative z-20">
-            <span
-              className="settle-type name-line name-line--trail block"
-              style={{ "--enter-delay": "0.42s" } as React.CSSProperties}
-            >
-              {profile.lastName}
-            </span>
+            <div className="relative z-30">
+              <span
+                className="settle-type name-line name-line--trail"
+                style={{ "--enter-delay": "0.34s" } as React.CSSProperties}
+              >
+                {profile.lastName}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* -- Lower register ------------------------------------------------- */}
-      <div className="shell mt-7 grid shrink-0 grid-cols-1 items-end gap-5 md:mt-9 md:grid-cols-12 md:gap-6">
+      <div className="hero-lower shell mt-7 grid shrink-0 grid-cols-1 items-end gap-5 md:mt-9 md:grid-cols-12 md:gap-6">
         <Band delay={1.05} from="up" className="md:col-span-5">
           <p className="lede max-w-[34ch] text-balance">{profile.lede}</p>
         </Band>

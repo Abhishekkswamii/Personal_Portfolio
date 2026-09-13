@@ -30,9 +30,9 @@ export default async function Home() {
   return (
     <>
       <Hero profile={content.profile} socials={content.socials} />
+      <Experience experiences={content.experiences} note={experienceNote} />
       <SelectedWork projects={content.projects} />
       <Services services={content.services} />
-      <Experience experiences={content.experiences} note={experienceNote} />
       <About profile={content.profile} education={content.education} />
       <Skills categories={content.skillCategories} />
       <Patent patent={content.patent} />

@@ -21,7 +21,7 @@ type ContactConfig = {
   email: string;
 };
 
-type Ctx = { open: () => void; close: () => void; isOpen: boolean; configured: boolean };
+type Ctx = { open: () => void; close: () => void; isOpen: boolean };
 
 const ContactFormContext = createContext<Ctx | null>(null);
 
@@ -31,18 +31,6 @@ export function useContactForm() {
     throw new Error("useContactForm must be used inside <ContactFormProvider>");
   }
   return ctx;
-}
-
-/** Google Forms only embeds from a URL carrying ?embedded=true. */
-function toEmbedUrl(raw: string): string {
-  if (!raw) return "";
-  try {
-    const url = new URL(raw);
-    url.searchParams.set("embedded", "true");
-    return url.toString();
-  } catch {
-    return "";
-  }
 }
 
 const FOCUSABLE =
@@ -56,26 +44,19 @@ export function ContactFormProvider({
   children: ReactNode;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [loaded, setLoaded] = useState(false);
   const reduced = useReducedMotion();
   const panelRef = useRef<HTMLDivElement>(null);
   const restoreFocus = useRef<HTMLElement | null>(null);
-
-  const embedUrl = useMemo(() => toEmbedUrl(config.formUrl), [config.formUrl]);
-  const configured = Boolean(embedUrl);
+  const [returnUrl] = useState(() =>
+    typeof window !== "undefined" ? window.location.href : "",
+  );
 
   const close = useCallback(() => setIsOpen(false), []);
 
   const open = useCallback(() => {
-    // With no form configured, do the useful thing rather than nothing.
-    if (!configured) {
-      window.location.href = `mailto:${config.email}`;
-      return;
-    }
     restoreFocus.current = document.activeElement as HTMLElement;
-    setLoaded(false);
     setIsOpen(true);
-  }, [configured, config.email]);
+  }, []);
 
   // Scroll lock — compensating for the scrollbar so the page doesn't shift.
   useEffect(() => {
@@ -140,8 +121,8 @@ export function ContactFormProvider({
   }, [isOpen]);
 
   const value = useMemo(
-    () => ({ open, close, isOpen, configured }),
-    [open, close, isOpen, configured],
+    () => ({ open, close, isOpen }),
+    [open, close, isOpen],
   );
 
   return (
@@ -199,7 +180,6 @@ export function ContactFormProvider({
                 <button
                   type="button"
                   onClick={close}
-                  data-autofocus
                   aria-label="Close"
                   className="group -mr-1 -mt-1 flex size-10 shrink-0 items-center justify-center rounded-full border border-rule transition-colors duration-300 hover:border-ink"
                 >
@@ -210,40 +190,71 @@ export function ContactFormProvider({
                 </button>
               </div>
 
-              {/* Form */}
-              <div className="relative min-h-0 flex-1">
-                {!loaded ? (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="label text-gray-light">Loading form…</span>
-                  </div>
-                ) : null}
-                <iframe
-                  src={embedUrl}
-                  title={config.heading}
-                  onLoad={() => setLoaded(true)}
-                  className="size-full border-0"
-                  style={{ opacity: loaded ? 1 : 0, transition: "opacity 400ms" }}
+              {/* Native Form */}
+              <div className="relative min-h-0 flex-1 overflow-y-auto">
+                <form
+                  action={`https://formsubmit.co/${config.email}`}
+                  method="POST"
+                  className="flex h-full flex-col gap-5 px-(--spacing-gutter) py-6 md:px-8"
                 >
-                  Loading…
-                </iframe>
+                  <input type="hidden" name="_next" value={returnUrl} />
+                  <input type="hidden" name="_subject" value="New message from your portfolio!" />
+                  
+                  <div>
+                    <label htmlFor="name" className="label mb-2 block text-gray">Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      id="name"
+                      required
+                      data-autofocus
+                      className="w-full rounded-lg border border-rule bg-paper px-4 py-3 text-[0.9375rem] outline-none transition-colors focus:border-ink"
+                      placeholder="Jane Doe"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="email" className="label mb-2 block text-gray">Email Address</label>
+                    <input
+                      type="email"
+                      name="email"
+                      id="email"
+                      required
+                      className="w-full rounded-lg border border-rule bg-paper px-4 py-3 text-[0.9375rem] outline-none transition-colors focus:border-ink"
+                      placeholder="jane@example.com"
+                    />
+                  </div>
+
+                  <div className="flex-1 flex flex-col min-h-[140px]">
+                    <label htmlFor="message" className="label mb-2 block text-gray">Message</label>
+                    <textarea
+                      name="message"
+                      id="message"
+                      required
+                      className="flex-1 w-full resize-none rounded-lg border border-rule bg-paper px-4 py-3 text-[0.9375rem] outline-none transition-colors focus:border-ink"
+                      placeholder="How can I help?"
+                    ></textarea>
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-[0.9375rem] font-medium text-paper transition-colors hover:bg-ink-soft md:w-auto md:px-8"
+                    >
+                      Send message
+                      <Arrow className="transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </button>
+                  </div>
+                </form>
               </div>
 
               {/* Footer */}
               <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-rule px-(--spacing-gutter) pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-4 md:px-8 md:pb-6">
                 <a
-                  href={config.formUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group inline-flex items-center gap-2 text-[0.8125rem] tracking-[-0.01em] text-gray transition-colors duration-300 hover:text-ink"
-                >
-                  Open form in a new tab
-                  <Arrow className="transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </a>
-                <a
                   href={`mailto:${config.email}`}
                   className="label text-gray-light transition-colors duration-300 hover:text-ink"
                 >
-                  or email directly
+                  Or email directly
                 </a>
               </div>
             </motion.div>
@@ -253,3 +264,4 @@ export function ContactFormProvider({
     </ContactFormContext.Provider>
   );
 }
+

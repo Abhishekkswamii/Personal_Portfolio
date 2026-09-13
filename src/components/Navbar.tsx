@@ -11,8 +11,8 @@ import { useContactForm } from "./ContactFormProvider";
 import { EASE_OUT } from "@/lib/motion";
 
 const SECTIONS = [
-  { id: "work", label: "Work" },
   { id: "experience", label: "Experience" },
+  { id: "work", label: "Projects" },
   { id: "about", label: "About" },
   { id: "contact", label: "Contact" },
 ] as const;

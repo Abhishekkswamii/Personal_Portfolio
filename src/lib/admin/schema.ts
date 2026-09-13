@@ -134,7 +134,7 @@ export const COLLECTIONS: Record<CollectionKey, Collection> = {
       { name: "images", label: "Images", type: "gallery", help: "Thumbnail for the homepage, hero for the case study, plus an optional gallery." },
       { name: "links", label: "Links", type: "richtext", help: "Source and live URLs. Blank links are hidden." },
       { name: "featured", label: "Featured", type: "boolean", half: true },
-      { name: "diagram", label: "Fallback diagram", type: "text", half: true, help: "sehat · medguard · fileint — the drawn schematic shown until you upload an image. Blank shows a plain placeholder." },
+      { name: "diagram", label: "Fallback diagram", type: "text", half: true, help: "sehat · vyapariq · fileint — the drawn schematic shown until you upload an image. Blank shows a plain placeholder." },
     ],
   },
 

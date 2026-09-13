@@ -162,7 +162,16 @@ body {
    from the rendered page rather than an estimate — estimating them is what
    let the surname fall off a 700px-tall window. */
 .hero-scale {
-  --name-base: clamp(2.25rem, min(19.4vw, (100svh - 20.6rem) / 1.9), 24rem);
+  /* Two constraints, whichever binds first. The width cap is generous enough
+     that HEIGHT is normally what governs — which is the honest way round: the
+     lockup should grow until the composition runs out of room, not stop at an
+     arbitrary share of the width and leave the gutters stranded.
+
+     --hero-furniture is everything in the hero that is not the lockup. It is
+     a measured number, not an estimate, and it is reduced on short windows
+     below because that is the only lever that actually buys the type size. */
+  --hero-furniture: 20.6rem;
+  --name-base: clamp(2.25rem, min(9.5vw, (100svh - var(--hero-furniture)) / 1.1), 16rem);
 }
 
 .name-line {
@@ -172,34 +181,82 @@ body {
   line-height: 0.8;
 }
 
-/* The two lines are one lockup, not two paragraphs: the surname is pulled up
-   into the given name's descender space so they read as a single mass. */
-.name-line--trail {
-  margin-top: -0.06em;
-}
-
+/* Mobile: The two lines are one lockup stacked. */
 .name-line--lead {
   font-size: var(--name-base);
   letter-spacing: -0.055em;
 }
 
 .name-line--trail {
-  font-size: calc(var(--name-base) * 1.371);
+  margin-top: -0.1em;
+  font-size: calc(var(--name-base) * 1.38);
   letter-spacing: -0.058em;
+}
+
+@media (min-width: 768px) {
+  .name-lockup {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.32em;
+  }
+  
+  .name-line {
+    display: inline-block;
+  }
+  
+  .name-line--lead,
+  .name-line--trail {
+    font-size: var(--name-base);
+    letter-spacing: -0.05em;
+    margin-top: 0;
+  }
+}
+
+/* Short desktop windows — a 700px-tall laptop is the common case, not an
+   edge case. Height is the only axis that buys type size here, so the hero's
+   own furniture is tightened and the reclaimed space is handed to the lockup:
+   the social list goes to a single row (it is three stacked lines otherwise,
+   the single most expensive item in the upper band) and the register gaps
+   close up. Without this the name stops ~290px short of each gutter and reads
+   as a small centred island inside an edge-aligned grid. */
+@media (min-width: 768px) and (max-height: 820px) {
+  .hero-scale {
+    --hero-furniture: 19.7rem;
+    /* The standing padding is generous for a tall window and merely wasteful
+       on a short one. Reclaiming it here is worth roughly six points of the
+       lockup's width — the difference between the type meeting the gutters
+       and stopping short of them. */
+    padding-top: calc(var(--nav-h) + 1.75rem);
+    padding-bottom: 1.5rem;
+  }
+
+  .hero-lower {
+    margin-top: 1.25rem;
+  }
 }
 
 /* Small screens take a larger share of the viewport — the name has to stay
    the dominant object, not shrink into the template. The portrait occupies
    the middle band here, so the height budget is larger. */
 @media (max-width: 767px) {
+  /* Sized against the MEASURE, not the viewport. The gutter is a fixed 20px
+     at every phone width, so a plain vw size fills 99% of the measure at
+     375px and overhangs it at 320px — the type scales but the gutter does
+     not. 0.251 is the measure-to-size ratio for this lockup (ABHISHEK is
+     3.94x its own font-size at this tracking), which lands the line on the
+     gutter at every width instead of only at the one it was tuned on. */
   .hero-scale {
-    --name-base: min(23vw, (100svh - 23.5rem) / 1.9);
+    --name-base: min(calc((100vw - 2.5rem) * 0.251), (100svh - 23.5rem) / 1.9);
   }
 }
 
 .name-outline {
   color: transparent;
-  -webkit-text-stroke: clamp(0.7px, 0.11vw, 1.6px) var(--color-ink);
+  /* A hairline outline at this size reads as timid rather than restrained;
+     the stroke has to carry the same authority as the solid line beneath. */
+  -webkit-text-stroke: clamp(1px, 0.135vw, 2.2px) var(--color-ink);
   paint-order: stroke fill;
 }
 
@@ -238,22 +295,34 @@ body {
    100% of the stage makes that impossible, and `aspect-ratio` derives the
    width so the crop never distorts. */
 .portrait-figure {
-  height: min(calc(var(--name-base) * 1.45), 100%);
+  /* On desktop, name-base is now smaller (~9.5vw) because it fits two words.
+     The multiplier is increased so the portrait remains large and anchors the hero. */
+  height: min(calc(var(--name-base) * 3.8), 100%);
   aspect-ratio: 1200 / 1359;
   width: auto;
 }
 
+/* Tablet portrait is nearer to the phone composition than to the desktop one:
+   a narrow column with a tall stage. */
+@media (min-width: 768px) and (max-width: 1023px) and (min-height: 821px) {
+  .portrait-figure {
+    height: min(calc(var(--name-base) * 5.5), 100%);
+  }
+}
+
+/* On a phone the figure is the middle band and the name sits under it. 
+   Mobile still uses the larger name-base since names are stacked. */
 @media (max-width: 767px) {
   .portrait-figure {
-    height: min(calc(var(--name-base) * 3.96), 100%);
+    height: min(calc(var(--name-base) * 5.3), 100%);
   }
 }
 
 /* -- Hover annotation ------------------------------------------------------
-   The marks and the colour plate are driven by one boolean on the root
-   (`data-hovered`) and two custom properties the rAF loop writes (--px/--py).
-   Nothing here re-renders on pointer move: the plate is positioned purely in
-   CSS from those properties, which is what keeps a 60fps trail cheap. */
+   Editorial registration marks, nothing more: thin corners, one guide, a
+   crosshair and a small technical label. Driven by a single boolean on the
+   root (`data-hovered`), so hovering costs one class change, not a render
+   per pointer move. */
 
 .portrait-marks {
   opacity: 0;
@@ -264,38 +333,14 @@ body {
   opacity: 1;
 }
 
-/* A small portrait-ratio plate that trails the pointer. Deliberately modest —
-   it is an annotation on the figure, not a second hero image.
-
-   Offset up and to the right of the cursor rather than centred on it: a plate
-   sitting under the pointer covers the very thing you are pointing at, which
-   on a portrait means it lands squarely on the face. */
-.portrait-plate {
-  left: var(--px, 50%);
-  top: var(--py, 50%);
-  width: 6.75rem;
-  aspect-ratio: 720 / 858;
-  transform: translate3d(1.75rem, -100%, 0) scale(0.92);
-  opacity: 0;
-  transition:
-    opacity 0.4s var(--ease-editorial),
-    transform 0.5s var(--ease-editorial);
-  box-shadow: 0 18px 40px -24px rgba(10, 9, 9, 0.45);
-  outline: 1px solid var(--color-rule);
-}
-
-[data-hovered="true"] .portrait-plate {
-  opacity: 1;
-  transform: translate3d(1.75rem, -100%, 0) scale(1);
-}
-
 /* The technical label sits over whatever the composition puts behind it —
-   often the solid surname. A paper chip keeps it legible without raising the
-   annotation above the type, which would break the stacking order. */
+   often the outlined given name. A paper chip keeps it legible without
+   raising the annotation above the type, which would break the stacking
+   order the whole hero depends on. Kept tight and unbordered: a boxed chip
+   with a rule around it starts to look like a tooltip. */
 .portrait-tag {
   background: var(--color-paper);
-  padding: 0.25rem 0.4rem;
-  box-shadow: 0 0 0 1px var(--color-rule);
+  padding: 0.15rem 0.3rem;
 }
 
 /* Hero portrait grade.
@@ -365,7 +410,7 @@ body {
 @keyframes enter-down {
   from {
     opacity: 0;
-    transform: translate3d(0, -16px, 0);
+    transform: translate3d(0, -14px, 0);
   }
   to {
     opacity: 1;
@@ -387,8 +432,8 @@ body {
 /* The name: oversized and pale, then settling into size and full contrast. */
 @keyframes settle-type {
   from {
-    opacity: 0.2;
-    transform: translate3d(0, -18px, 0) scale(1.045);
+    opacity: 0.22;
+    transform: translate3d(0, -16px, 0) scale(1.035);
   }
   to {
     opacity: 1;
@@ -431,7 +476,7 @@ body {
    Everything is still by ~2s, and nothing loops. */
 
 .enter-down {
-  animation: enter-down 0.8s var(--ease-editorial) var(--enter-delay, 0s) both;
+  animation: enter-down 0.78s var(--ease-editorial) var(--enter-delay, 0s) both;
 }
 
 .enter-up {
@@ -516,8 +561,7 @@ body {
 
   /* The hover annotation stays available — it is an interaction, not an
      entrance — but it appears rather than glides. */
-  .portrait-marks,
-  .portrait-plate {
+  .portrait-marks {
     transition: none !important;
   }
 
