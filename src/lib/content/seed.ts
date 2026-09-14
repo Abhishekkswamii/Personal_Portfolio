@@ -51,7 +51,7 @@ export const seed: SiteContent = {
       "Have a project, a role, a collaboration or an idea? Tell me about it and I’ll get back to you.",
     contactHeadline: ["Let’s build", "something useful."],
     footerText: "Software Engineer · AI · Full-Stack",
-    siteUrl: "https://abhishekswami.dev",
+    siteUrl: "https://abhishekswami.work.gd",
   },
 
   socials: [

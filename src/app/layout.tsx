@@ -17,7 +17,8 @@ const geistMono = Geist_Mono({
 
 export async function generateMetadata(): Promise<Metadata> {
   const { settings, profile } = await getSiteContent();
-  const base = settings.siteUrl || "https://abhishekswami.dev";
+  const base = settings.siteUrl || "https://abhishekswami.work.gd";
+  const ogImageUrl = `${base}/images/abhishek-og.png`;
 
   return {
     metadataBase: new URL(base),
@@ -34,11 +35,20 @@ export async function generateMetadata(): Promise<Metadata> {
       title: settings.seoTitle,
       description: settings.seoDescription,
       locale: "en_GB",
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: "Abhishek Swami — Software Engineer",
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: settings.seoTitle,
       description: settings.seoDescription,
+      images: [ogImageUrl],
     },
     robots: { index: true, follow: true },
   };
