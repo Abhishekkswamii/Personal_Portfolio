@@ -38,14 +38,14 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [
         {
           url: ogImageUrl,
-          width: 1200,
-          height: 630,
+          width: 800,
+          height: 800,
           alt: "Abhishek Swami — Software Engineer",
         },
       ],
     },
     twitter: {
-      card: "summary_large_image",
+      card: "summary",
       title: settings.seoTitle,
       description: settings.seoDescription,
       images: [ogImageUrl],
