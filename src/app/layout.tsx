@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 export async function generateMetadata(): Promise<Metadata> {
   const { settings, profile } = await getSiteContent();
   const base = settings.siteUrl || "https://abhishekswami.work.gd";
-  const ogImageUrl = `${base}/images/abhishek-og.png`;
+  const ogImageUrl = `${base}/images/abhishek-og.jpg`;
 
   return {
     metadataBase: new URL(base),
